@@ -1,0 +1,155 @@
+/* الخلفية والأنميشن الأساسي */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(45deg, #1a2a6c, #b21f1f, #fdbb2d);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    min-height: 100vh;
+    padding-bottom: 90px;
+    color: #fff;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* تعديل ألوان العناوين */
+h3, h4, h5, h6, .modal-title {
+    color: #ff3d3d !important;
+    text-shadow: 1px 1px 2px black;
+    font-weight: 900 !important;
+}
+
+/* شاشة تسجيل الدخول */
+.login-screen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(45deg, #000000, #434343);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* لافتة تثبيت التطبيق */
+.install-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border-bottom: 2px solid #ffc107;
+    z-index: 10000;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+/* التصميم الزجاجي */
+.glass-card {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    margin-bottom: 15px;
+    color: white;
+    transition: transform 0.2s;
+}
+
+.glass-input, .glass-select, textarea {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #fff !important;
+}
+
+.glass-input::placeholder, textarea::placeholder { color: rgba(255, 255, 255, 0.7); }
+.glass-input:focus, textarea:focus {
+    background: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+/* تخصيص الجدول */
+.table-glass {
+    color: white;
+    border-color: rgba(255,255,255,0.2);
+}
+.table-glass th, .table-glass td {
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    vertical-align: middle;
+}
+
+/* الشريط السفلي */
+.bottom-nav {
+    position: fixed; bottom: 15px; left: 15px; right: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex; justify-content: space-around;
+    padding: 10px 0; z-index: 1000;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+.nav-item { text-align: center; color: rgba(255,255,255,0.6); cursor: pointer; flex: 1; transition: 0.3s; }
+.nav-item.active { color: #fff; transform: scale(1.1); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+.nav-icon { font-size: 1.4rem; display: block; }
+.nav-text { font-size: 0.7rem; }
+
+.tab-content { display: none; animation: fadeIn 0.5s; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.balance-pos { color: #76ff03; font-weight: bold; } 
+.balance-neg { color: #ff5252; font-weight: bold; } 
+
+option { background-color: #333; color: white; }
+
+/* عناصر القائمة */
+.worker-list-item {
+    display: flex; flex-direction: column; 
+    padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);
+    gap: 10px;
+}
+.worker-actions {
+    display: flex; gap: 5px; justify-content: flex-end; width: 100%;
+}
+.worker-name-click { cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+
+/* المودال */
+.modal-content-glass {
+    background: rgba(40, 40, 60, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 15px;
+}
+
+.selected-workers-list span {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 5px 10px;
+    border-radius: 15px;
+    margin: 2px;
+    font-size: 0.9rem;
+}
+
+.edit-icon {
+    cursor: pointer;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 5px;
+    margin-left: 5px;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+.edit-icon:hover {
+    background: #ffc107;
+    color: #000;
+}
