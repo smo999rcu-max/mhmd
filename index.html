@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل العمال - تطبيق ذكي</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a2a6c">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3790/3790539.png">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="installBanner" class="install-banner" style="display: none;">
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <img src="https://cdn-icons-png.flaticon.com/512/3790/3790539.png" alt="App Icon" style="width: 40px; height: 40px; margin-left: 10px;">
+            <div>
+                <h6 class="m-0 fw-bold text-white">تطبيق سجل العمال</h6>
+                <small class="text-white-50">ثبته الآن للعمل بدون إنترنت</small>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-light text-dark fw-bold ms-2" onclick="installPWA()">تثبيت</button>
+            <button class="btn btn-sm btn-outline-light" onclick="hideInstallBanner()">لاحقاً</button>
+        </div>
+    </div>
+</div>
+
+<div id="loginOverlay" class="login-screen">
+    <div class="glass-card p-4 text-center" style="max-width: 350px; width: 90%;">
+        <h3 class="mb-4">🔐 تسجيل الدخول</h3>
+        <input type="password" id="appPassword" class="form-control glass-input mb-3 text-center" placeholder="أدخل رمز الدخول">
+        <button class="btn btn-warning w-100 fw-bold" onclick="checkLogin()">دخول 🚀</button>
+    </div>
+</div>
+
+<div class="container py-4">
+
+    <div id="tab-home" class="tab-content active">
+        <h3 class="text-center mb-4">📋 سجل الحضور والرواتب</h3>
+        
+        <div class="glass-card p-3">
+            <h6 class="mb-2">تسجيل حضور ليوم:</h6>
+            <div class="mb-2">
+                <input type="date" id="attendanceDate" class="form-control glass-input">
+            </div>
+            <div class="input-group mb-2">
+                <select id="workerAttendanceSelect" class="form-select glass-select">
+                    <option value="">اختر عاملاً...</option>
+                </select>
+                <button class="btn btn-warning" onclick="addToTempList()">+ إضافة للقائمة</button>
+            </div>
+            
+            <div id="tempWorkersDisplay" class="selected-workers-list mb-3"></div>
+            
+            <button class="btn btn-success w-100 fw-bold" onclick="saveBatchAttendance()">حفظ الحضور ✅</button>
+        </div>
+
+        <div class="glass-card p-3 text-center mb-3">
+            <h6 class="mb-2 text-white-50">صافي الرصيد الكلي (مستحقات العمال)</h6>
+            <h2 id="grandTotalDisplay" class="fw-bold m-0 text-white">0 د.ع</h2>
+            <small id="connectionStatus" class="badge bg-secondary mt-1">جاري التحقق من الشبكة...</small>
+        </div>
+
+        <div class="glass-card p-3">
+            <div class="table-responsive">
+                <table class="table table-glass text-center mb-0">
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>أيام العمل</th>
+                            <th>الرصيد الصافي</th>
+                            <th>التفاصيل</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mainTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-notes" class="tab-content">
+        <h3 class="text-center mb-4">📝 الملاحظات</h3>
+        
+        <button class="btn btn-dark w-100 mb-3 border-secondary" onclick="toggleSecretSection()">🔐 ملاحظة سرية / الخزنة</button>
+
+        <div id="secretSection" class="glass-card p-3 mb-3" style="display: none; border: 1px solid #ffc107;">
+            <h5 class="text-center text-warning mb-3">💰 الخزنة السرية</h5>
+            
+            <div class="text-center mb-3 p-2" style="background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <small class="text-white-50">المبلغ الكلي المتبقي</small>
+                <h2 id="secretTotalDisplay" class="fw-bold text-warning m-0">0 د.ع</h2>
+            </div>
+
+            <hr class="border-warning">
+
+            <label class="text-white-50 mb-1">إضافة رأس مال (شحن الخزنة):</label>
+            <div class="input-group mb-3">
+                <input type="number" id="addSecretAmount" class="form-control glass-input" placeholder="المبلغ للإضافة">
+                <button class="btn btn-success" onclick="addToSecretTotal()">+ شحن</button>
+            </div>
+
+            <hr class="border-white">
+
+            <label class="text-white-50 mb-1">صرف / تنقيص من الخزنة:</label>
+            <input type="text" id="deductNoteName" class="form-control glass-input mb-2" placeholder="اسم الملاحظة / سبب الصرف">
+            <input type="number" id="deductAmount" class="form-control glass-input mb-2" placeholder="مبلغ الصرف">
+            <button class="btn btn-danger w-100 mb-3" onclick="deductFromSecret()">🔻 تنقيص من المبلغ</button>
+
+            <h6 class="text-white-50">سجل العمليات:</h6>
+            <ul id="secretLogsList" class="list-group" style="max-height: 200px; overflow-y: auto;"></ul>
+        </div>
+        
+        <div class="glass-card p-3">
+            <label class="mb-2">إضافة ملاحظة جديدة:</label>
+            <textarea id="noteText" class="form-control glass-input mb-2" rows="2" placeholder="اكتب الملاحظة هنا..."></textarea>
+            <button class="btn btn-primary w-100" onclick="addNote()">حفظ الملاحظة</button>
+        </div>
+
+        <div id="notesList"></div>
+    </div>
+
+    <div id="tab-workers" class="tab-content">
+        <h3 class="text-center mb-4">👷 إدارة العمال والسلف</h3>
+        <div class="glass-card p-2" id="manageWorkersList"></div>
+    </div>
+
+    <div id="tab-add" class="tab-content">
+        <h3 class="text-center mb-4">➕ إضافة عامل</h3>
+        <div class="glass-card p-4">
+            <div class="mb-4">
+                <label class="form-label">اسم العامل:</label>
+                <input type="text" id="newWorkerName" class="form-control glass-input form-control-lg" placeholder="اكتب الاسم هنا...">
+            </div>
+            <div class="mb-4">
+                <label class="form-label">قيمة اليومية (د.ع):</label>
+                <input type="number" id="newWorkerWage" class="form-control glass-input" placeholder="مثلاً 25000">
+            </div>
+            <button class="btn btn-light w-100 btn-lg fw-bold" style="color: #333;" onclick="addNewWorker()">حفظ العامل ✅</button>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="loanModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-glass">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title">💰 إدارة السلف: <span id="loanWorkerName"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h4 class="mb-2">مجموع السلف</h4>
+                <h2 id="totalLoanDisplay" class="text-white fw-bold mb-4">0 د.ع</h2>
+                
+                <hr class="border-light">
+                
+                <h6 class="text-start">إضافة سلفة جديدة:</h6>
+                <input type="date" id="loanDate" class="form-control glass-input mb-2">
+                <input type="number" id="loanAmount" class="form-control glass-input mb-2" placeholder="المبلغ بالدينار العراقي">
+                <button class="btn btn-warning w-100 mb-3 fw-bold" onclick="saveLoan()">حفظ السلفة</button>
+                
+                <div class="table-responsive mb-3" style="max-height: 200px; overflow-y: auto;">
+                    <table class="table table-glass table-sm text-center">
+                        <thead><tr><th>التاريخ</th><th>المبلغ</th></tr></thead>
+                        <tbody id="loanListBody"></tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-outline-danger w-100" onclick="resetLoans()">🔄 تصفير السلف</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-glass">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title">تفاصيل الرصيد والحضور</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <button id="resetAttendanceBtn" class="btn btn-danger w-100 mb-3 fw-bold">🗑️ تصفير رصيد الحضور بالكامل</button>
+
+                <div class="text-center mb-3 p-2" style="background: rgba(255,255,255,0.1); border-radius: 10px;">
+                    <small class="text-white-50">مجموع الرصيد (من العمل)</small>
+                    <h2 id="detailsTotalBalance" class="fw-bold text-success m-0">0 د.ع</h2>
+                </div>
+                
+                <h6 class="mb-2">تواريخ الحضور:</h6>
+                <ul class="list-group" id="workDatesList" style="max-height: 300px; overflow-y: auto;"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('home', this)">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-text">الرئيسية</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('notes', this)">
+        <span class="nav-icon">📝</span>
+        <span class="nav-text">ملاحظة</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('workers', this)">
+        <span class="nav-icon">👷</span>
+        <span class="nav-text">العمال</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('add', this)">
+        <span class="nav-icon">➕</span>
+        <span class="nav-text">إضافة</span>
+    </div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="script.js"></script>
+</body>
+</html>
